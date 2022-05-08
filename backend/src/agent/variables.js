@@ -4,6 +4,9 @@ import { toJson } from "plain-text-data-to-json";
 export let variables;
 
 export const setVariables = () => {
-  const doc = fs.readFileSync("config.txt", "utf8");
+  const configPath = process.argv[2];
+  console.log("Config Path", configPath);
+  const doc = fs.readFileSync(configPath, "utf8");
   variables = toJson(doc);
+  console.log(variables);
 };

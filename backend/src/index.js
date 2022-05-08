@@ -23,6 +23,7 @@ const minioClient = require("./minio");
 require("dotenv").config();
 
 const createAgent = () => {
+  console.log("CREATING AGENT");
   fs.writeFileSync(
     path.join(__dirname, "/agent/.env"),
     `MINIO_ENDPOINT=${process.env.MINIO_ENDPOINT}

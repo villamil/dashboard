@@ -24,8 +24,10 @@ services:
   minio: 
     image: quay.io/minio/minio
     volumes: ["disk:/data"]
-    command: server --address :9000 /data
     env_file: ./env-minio.env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
 
   mongo:
     image: mongo:4

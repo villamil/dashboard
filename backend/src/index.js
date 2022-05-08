@@ -45,7 +45,7 @@ MINIO_SECRET_KEY=${process.env.MINIO_SECRET_KEY}
 };
 
 (async function boot() {
-  // createAgent();
+  createAgent();
   const app = express();
 
   app.use("/api", cors());

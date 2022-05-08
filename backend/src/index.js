@@ -36,13 +36,16 @@ MINIO_SECRET_KEY=${process.env.MINIO_SECRET_KEY}
   const agentPath = path.join(__dirname, "/agent");
   exec(`cd ${agentPath} && npm install `, (err, stdout, stderr) => {
     // ...
+    console.log(err);
     console.log(stdout);
   });
 
   exec(`pkg ${agentPath}/index.js`, (err, stdout, stderr) => {
     // ...
+    console.log(err);
     console.log(stdout);
   });
+  console.log("finished building ? ");
 };
 
 (async function boot() {

@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  client:
+    build:
+      context: ./client
+    ports:
+      - "80:80"
+    depends_on: ["backend"]
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "4000:4000"
+    depends_on: ["minio", "mongo"]
+
+  agent-manager:
+    build:
+      context: ./agent-manager
+    ports:
+      - "8080:8080"
+    depends_on: ["minio", "mongo"]
+
+  minio: 
+    image: quay.io/minio/minio
+    volumes: ["disk:/data"]
+    command: server --address :9000 /data
+    env_file: ./env-minio.env
+
+  mongo:
+    image: mongo:4
+    volumes: ["mongo:/data"]
+    ports: ["27017:27017"]
+
+volumes:
+  disk:
+  mongo:

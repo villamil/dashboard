@@ -1,0 +1,19 @@
+html {
+  height: 100%;
+}
+
+body,
+#root {
+  height: 100%;
+}
+
+p {
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu {
+  width: 200px;
+  padding-left: 20px;
+  padding-top: 20px;
+}

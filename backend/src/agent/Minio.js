@@ -1,7 +1,6 @@
-import { Dir } from "fs";
-import Minio from "minio";
-import path from "path";
-import { setVariables, variables } from "./variables.js";
+const Minio = require("minio");
+const path = require("path");
+const { setVariables, variables } = require("./variables.js");
 
 setVariables();
 class MinioHandler {
@@ -48,4 +47,4 @@ class MinioHandler {
 
 const minioHandler = new MinioHandler();
 
-export default minioHandler;
+module.exports = minioHandler;

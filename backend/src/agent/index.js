@@ -1,9 +1,9 @@
-import io from "socket.io-client";
-import os from "os";
-import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
-import { setVariables, variables } from "./variables.js";
-import Job from "./Job.js";
+const io = require("socket.io-client");
+const os = require("os");
+const { uuidv4 } = require("uuid");
+const axios = require("axios");
+const { setVariables, variables } = require("./variables.js");
+const Job = require("./Job.js");
 
 const jobs = [];
 setVariables();

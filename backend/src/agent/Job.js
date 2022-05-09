@@ -1,9 +1,7 @@
-import Docker from "dockerode";
-import minioHandler from "./Minio.js";
-import tmp from "tmp";
-import fs from "fs";
-import path from "path";
-import Queue from "async-await-queue";
+const Docker = require("dockerode");
+const minioHandler = require("./Minio.js");
+const tmp = require("tmp");
+const path = require("path");
 
 class Job {
   constructor(socket) {
@@ -89,4 +87,4 @@ class Job {
   }
 }
 
-export default Job;
+module.exports = Job;

@@ -1,9 +1,8 @@
-import fs from "fs";
-import { toJson } from "plain-text-data-to-json";
+const fs = require("fs");
+const toJson = require("./plain-text-to-json");
+let variables;
 
-export let variables;
-
-export const setVariables = () => {
+const setVariables = () => {
   const configPath = process.argv[2];
   console.log("Config Path", configPath);
   let doc;
@@ -14,4 +13,9 @@ export const setVariables = () => {
   }
   variables = toJson(doc);
   console.log(variables);
+};
+
+module.exports = {
+  variables,
+  setVariables,
 };

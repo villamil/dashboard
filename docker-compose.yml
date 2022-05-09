@@ -21,7 +21,7 @@ services:
       - "8080:8080"
     depends_on: ["minio", "mongo"]
 
-  minio: 
+  minio:
     image: quay.io/minio/minio
     volumes: ["disk:/data"]
     command: server /data --console-address :9001
@@ -32,6 +32,9 @@ services:
 
   mongo:
     image: mongo:4
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=verystrongpassword
     volumes: ["mongo:/data"]
     ports: ["27017:27017"]
 

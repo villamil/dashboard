@@ -78,11 +78,7 @@ MINIO_SECRET_KEY=${process.env.MINIO_SECRET_KEY}
 
   app.use(bodyParser.json());
 
-  const mongoUri = template(
-    process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/db"
-  );
-
-  await connect(mongoUri({ env: process.env }), {
+  await connect(process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/db", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });

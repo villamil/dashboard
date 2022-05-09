@@ -1,8 +1,8 @@
 const Minio = require("minio");
 const path = require("path");
-const { setVariables, variables } = require("./variables.js");
+const { setVariables } = require("./variables.js");
 
-setVariables();
+variables = setVariables();
 class MinioHandler {
   constructor() {
     this.minioClient = new Minio.Client({

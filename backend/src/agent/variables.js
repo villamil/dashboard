@@ -1,5 +1,6 @@
 const fs = require("fs");
 const toJson = require("./plain-text-to-json");
+
 let variables;
 
 const setVariables = () => {
@@ -12,7 +13,7 @@ const setVariables = () => {
     console.log(error);
   }
   variables = toJson(doc);
-  console.log(variables);
+  return variables;
 };
 
 module.exports = {

@@ -1,12 +1,12 @@
 const io = require("socket.io-client");
 const os = require("os");
-const { uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 const axios = require("axios");
-const { setVariables, variables } = require("./variables.js");
+const { setVariables } = require("./variables.js");
 const Job = require("./Job.js");
 
 const jobs = [];
-setVariables();
+variables = setVariables();
 
 console.log("Conectando");
 

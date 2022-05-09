@@ -103,7 +103,8 @@ io.on("connection", async (socket) => {
   const os = socket.handshake.query.os;
   const userId = socket.handshake.query.userId;
 
-  const connection = await Connections.findOne({ clientId });
+  let connection = await Connections.findOne({ clientId });
+
   const project = await Projects.findOneAndUpdate(
     { _id: projectId, volunteers: { $ne: userId } },
     {
@@ -112,7 +113,7 @@ io.on("connection", async (socket) => {
   );
 
   if (!connection) {
-    await Connections.create({
+    connection = await Connections.create({
       clientId,
       status: CONNECTION_STATUS.CONNECTED,
       os,

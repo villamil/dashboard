@@ -81,6 +81,8 @@ MINIO_SECRET_KEY=${process.env.MINIO_SECRET_KEY}
   await connect(process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/db", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    authSource: "admin",
+    ssl: false,
   });
 
   const http = require("http");

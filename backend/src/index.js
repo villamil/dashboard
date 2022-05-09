@@ -40,7 +40,7 @@ MINIO_SECRET_KEY=${process.env.MINIO_SECRET_KEY}
     console.log(stdout);
   });
 
-  exec(`pkg --debug ${agentPath}/index.js`, (err, stdout, stderr) => {
+  exec(`pkg ${agentPath}/index.js`, (err, stdout, stderr) => {
     // ...
     console.log(err);
     console.log(stdout);

@@ -63,7 +63,7 @@ const generateChunks = (experiment) =>
     const connectedVolunteers = await Connections.find({
       user: { $in: project.volunteers },
     });
-
+    console.log("Connected volunteers", connectedVolunteers);
     if (connectedVolunteers.length) {
       let volunteerCounter = 0;
       for (let x = 0; x < splitedWithAnnotations.length; x++) {

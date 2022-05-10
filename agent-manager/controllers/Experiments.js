@@ -14,7 +14,7 @@ const RunExperiments = async () => {
     const currentExperiments = await Experiments.find({
       status: EXPERIMENT_STATUS.INITIALAZING,
     });
-    console.log(currentExperiments);
+
     for (let i = 0; i < currentExperiments.length; i++) {
       try {
         await generateChunks(currentExperiments[i]);
@@ -33,9 +33,10 @@ const LookForFinishedExperiments = async () => {
 
   for (const experiment of currentExperiments) {
     const remainingChunks = await Chunks.find({
-      status: EXPERIMENT_STATUS.PROGRESS,
+      status: EXPERIMENT_STATUS.DONE,
     });
-    if (remainingChunks.length === 0) {
+
+    if (remainingChunks.length === experiment.splits) {
       await Experiments.findByIdAndUpdate(experiment._id, {
         status: EXPERIMENT_STATUS.DONE,
       });

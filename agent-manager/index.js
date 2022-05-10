@@ -88,14 +88,27 @@ app.get("/chunk-files", async (req, res) => {
     console.log(clientId);
     const connection = await Connections.findOne({ clientId });
     console.log("connection", connection);
-    const chunkInfo = await Chunks.findOne({
-      assignetTo: connection._id,
-      status: EXPERIMENT_STATUS.INITIALAZING,
+    const project = await Projects.findOne({
+      volunteers: [connection.user],
     });
+
+    const chunkInfo = await Chunks.findOneAndUpdate(
+      {
+        experiment: { $in: project.experiments },
+        assignetTo: { $exists: false },
+        status: EXPERIMENT_STATUS.INITIALAZING,
+      },
+      {
+        status: EXPERIMENT_STATUS.PROGRESS,
+      },
+      {
+        new: true,
+      }
+    );
+
     console.log("chunkInfo", chunkInfo);
     const latestFinishedChunk = await Chunks.findOne(
       {
-        assignetTo: connection._id,
         status: EXPERIMENT_STATUS.DONE,
         experiment: chunkInfo.experiment,
       },

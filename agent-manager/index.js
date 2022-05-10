@@ -89,7 +89,7 @@ app.get("/chunk-files", async (req, res) => {
     const connection = await Connections.findOne({ clientId });
     console.log("connection", connection);
     const project = await Projects.findOne({
-      volunteers: { $in: [connection.user] },
+      volunteers: { $all: [connection.user] },
     });
     console.log("project", project);
 

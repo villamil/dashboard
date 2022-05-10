@@ -8,7 +8,7 @@ const io = new Server(server);
 // const Job = require("./Job");
 const minioClient = require("./Minio");
 const template = require("lodash/template");
-const { connect } = require("mongoose");
+const { connect, ObjectId } = require("mongoose");
 const Connections = require("./collections/Connections");
 const Projects = require("./collections/Projects");
 const Experiments = require("./collections/Experiments");
@@ -90,7 +90,7 @@ app.get("/chunk-files", async (req, res) => {
     console.log("connection", connection);
     console.log(connection.user.toString());
     const project = await Projects.findOne({
-      volunteers: { $all: [connection.user.toString()] },
+      volunteers: { $all: [ObjectId(connection.user.toString())] },
     });
     console.log("project", project);
 

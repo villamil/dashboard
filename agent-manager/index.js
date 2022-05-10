@@ -89,9 +89,9 @@ app.get("/chunk-files", async (req, res) => {
     const connection = await Connections.findOne({ clientId });
     console.log("connection", connection);
     const project = await Projects.findOne({
-      volunteers: [connection.user],
+      volunteers: { $in: [connection.user] },
     });
-    console.log("connection", project);
+    console.log("project", project);
 
     const chunkInfo = await Chunks.findOneAndUpdate(
       {

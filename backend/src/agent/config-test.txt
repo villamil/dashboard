@@ -1,8 +1,8 @@
-minio_endpoint      : 192.168.100.27
+minio_endpoint      : 100.25.255.202
 minio_port          : 9000
 minio_access_key    : AKIAIOSFODNN7EXAMPLE
 minio_secret_key    : wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-agent_manager_url   : http://192.168.100.27
+agent_manager_url   : http://100.25.255.202
 agent_manager_port  : 8080
 user_id             : 627326c9ba62e74bacbdca95
 project_id          : 62780dcc8367ecc0d2e8819f

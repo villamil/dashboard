@@ -62,7 +62,7 @@ const ExperimentList = (props) => {
     },
     {
       Header: "Descargar Modelo",
-      accessor: "result",
+      accessor: "download",
       Cell: ({ value }) => {
         return <a href={value}>Descargar</a>;
       },
@@ -100,7 +100,14 @@ const ExperimentList = (props) => {
     },
   ];
 
-  return <Table columns={columns} data={data} emptyData={<EmptyData />} />;
+  return (
+    <Table
+      columns={columns}
+      data={data}
+      emptyData={<EmptyData />}
+      disableClick
+    />
+  );
 };
 
 export default ExperimentList;

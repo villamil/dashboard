@@ -44,6 +44,7 @@ MINIO_SECRET_KEY=${process.env.MINIO_SECRET_KEY}
     // ...
     console.log(err);
     console.log(stdout);
+    console.log("Finished packaging agent");
   });
   console.log("finished building ? ");
 };

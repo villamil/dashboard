@@ -10,8 +10,9 @@ class Job {
     this.tmpFolder = tmp.dirSync({ unsafeCleanup: true });
   }
 
-  async run(args) {
+  async run(args, cb) {
     this.args = args;
+    this.cb = cb;
     if (this.args.latestWeight) {
       console.log(this.args.latestWeight);
       await minioHandler.moveToTmp(
@@ -59,10 +60,14 @@ class Job {
       async (err, data, container) => {
         // console.log("container done, check folder", this.tmpFolder.name);
         // console.log(data && data.StatusCode);
+        console.log(err);
+        console.log(data);
+        console.log(container);
         console.log("done");
         await this.uploadModel();
         this.clear();
         this.jobDone();
+        this.cb?.();
       }
     );
   }

@@ -52,6 +52,7 @@ export const GET_EXPERIMENTS = gql`
         _id
         name
       }
+      download
     }
   }
 `;
@@ -76,6 +77,17 @@ export const GET_CONNECTIONS = gql`
       clientId
       status
       os
+      user {
+        name
+      }
+    }
+  }
+`;
+
+export const GET_RANKINGS = gql`
+  query getRankings {
+    getRankings {
+      rank
       user {
         name
       }

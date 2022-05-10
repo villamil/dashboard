@@ -15,6 +15,8 @@ const typeDefs = gql`
     getVolunteerConfig: VolunteerConfig
 
     getConnections: [Connection]
+
+    getRankings: [Ranking]
   }
 
   type Mutation {
@@ -54,6 +56,7 @@ const typeDefs = gql`
     dataset: Dataset
     project: Project
     user: User
+    download: String
   }
 
   type Project {
@@ -80,6 +83,11 @@ const typeDefs = gql`
     clientId: String
     status: String
     os: String
+    user: User
+  }
+
+  type Ranking {
+    rank: Int
     user: User
   }
 `;

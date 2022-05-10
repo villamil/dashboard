@@ -10,8 +10,6 @@ variables = setVariables();
 
 console.log("Conectando");
 
-let connectionId;
-let runningJob = false;
 const networkInterfaces = os.networkInterfaces();
 
 const macAddressList = Object.keys(networkInterfaces).filter(
@@ -41,10 +39,6 @@ const socket = io(
   }
 );
 
-socket.on("send-connection-id", ({ connectionId }) => {
-  connectionId = connectionId;
-});
-
 socket.on("connect", (...args) => {
   console.log(args);
   console.log("Conectado!");
@@ -57,38 +51,44 @@ socket.on("disconnect", (reason) => {
 let blocked = false;
 
 const startJob = async () => {
-  if (!blocked) {
+  if (!blocked && clientId) {
     blocked = true;
-    const {
-      data: { chunkInfo, experiment, bucketName, latestWeight },
-    } = await axios.get(
-      `${variables.agent_manager_url}:${variables.agent_manager_port}/chunk-files`,
-      { params: { connectionId } }
-    );
-    console.log(chunkInfo);
-    if (chunkInfo) {
-      const job = new Job(socket);
-      job.run({
-        files: chunkInfo.files,
-        bucketName,
-        image: experiment.image,
-        chunkId: chunkInfo._id,
-        latestWeight,
-      });
-
-      socket.emit("chunk-started", { chunkId: chunkInfo._id });
-      runningJob = true;
+    try {
+      console.log("send clientId", clientId);
+      const {
+        data: { chunkInfo, experiment, bucketName, latestWeight },
+      } = await axios.get(
+        `${variables.agent_manager_url}:${variables.agent_manager_port}/chunk-files`,
+        { params: { clientId } }
+      );
+      if (chunkInfo) {
+        const job = new Job(socket);
+        job.run(
+          {
+            files: chunkInfo.files,
+            bucketName,
+            image: experiment.image,
+            chunkId: chunkInfo._id,
+            latestWeight,
+          },
+          () => {
+            blocked = false;
+            startJob();
+          }
+        );
+        socket.emit("chunk-started", { chunkId: chunkInfo._id });
+      }
+    } catch (error) {
+      console.log(error);
+      blocked = false;
     }
-    blocked = false;
   }
 };
 
 function lookForJobs() {
   setTimeout(async () => {
     console.log("Looking for jobs ");
-    if (!runningJob) {
-      startJob();
-    }
+    startJob();
 
     lookForJobs();
   }, 1000 * 60 * 2);

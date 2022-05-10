@@ -3,6 +3,7 @@ const ExperimentsResolvers = require("./experiments");
 const DatasetsResolvers = require("./datasets");
 const VolunteerConfig = require("./volunteers");
 const ConnectionsResolver = require("./connections");
+const RankingResolver = require("./rankings");
 
 const rootResolver = [
   ProjectsResolvers,
@@ -10,6 +11,7 @@ const rootResolver = [
   DatasetsResolvers,
   VolunteerConfig,
   ConnectionsResolver,
+  RankingResolver,
 ];
 
 module.exports = rootResolver;

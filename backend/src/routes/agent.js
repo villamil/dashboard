@@ -12,13 +12,13 @@ Agent.get(
     console.log(os);
     switch (os) {
       case "linux":
-        res.download(path.join(__dirname, "../..", "index-linux"));
+        res.download(path.join(__dirname, "..", "index-linux"));
         break;
       case "mac":
-        res.download(path.join(__dirname, "../..", "index-macos"));
+        res.download(path.join(__dirname, "..", "index-macos"));
         break;
       case "windows":
-        res.download(path.join(__dirname, "../..", "index-win.exe"));
+        res.download(path.join(__dirname, "..", "index-win.exe"));
         break;
       default:
         res.send(null);

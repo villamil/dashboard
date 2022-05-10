@@ -3,6 +3,7 @@ const Projects = require("../collections/Projects");
 const Experiments = require("../collections/Experiments");
 const { EXPERIMENT_STATUS } = require("../constants");
 const { generateChunks } = require("./Chunks");
+const Chunks = require("../collections/Chunks");
 
 let blocked = false;
 
@@ -25,6 +26,23 @@ const RunExperiments = async () => {
   }
 };
 
+const LookForFinishedExperiments = async () => {
+  const currentExperiments = await Experiments.find({
+    status: EXPERIMENT_STATUS.PROGRESS,
+  });
+
+  for (const experiment of currentExperiments) {
+    const remainingChunks = await Chunks.find({
+      status: EXPERIMENT_STATUS.PROGRESS,
+    });
+    if (remainingChunks.length === 0) {
+      await Experiments.findByIdAndUpdate(experiment._id, {
+        status: EXPERIMENT_STATUS.DONE,
+      });
+    }
+  }
+};
+
 const LookForDoneExperiments = async () => {};
 
-module.exports = { RunExperiments };
+module.exports = { RunExperiments, LookForFinishedExperiments };

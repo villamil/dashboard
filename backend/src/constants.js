@@ -10,4 +10,4 @@ const CONNECTION_STATUS = {
   DISCONNECTED: "Desconectado",
 };
 
-module.exports = EXPERIMENT_STATUS;
+module.exports = { EXPERIMENT_STATUS, CONNECTION_STATUS };

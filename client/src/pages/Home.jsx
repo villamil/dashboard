@@ -2,28 +2,10 @@ import { Card, Row, Col } from "react-bootstrap";
 import CreateProjectCard from "components/CreateProjectCard";
 import CreateVolunteerCard from "components/CreateVolunteerCard";
 import { useQuery } from "@apollo/client";
-import { GET_BOOKS } from "graphql/queries";
+import { GET_RANKINGS } from "graphql/queries";
 
-const topVoluntarios = [
-  {
-    name: "Luis Villamil",
-    harts: 12,
-  },
-  {
-    name: "Luis Villamil",
-    harts: 12,
-  },
-  {
-    name: "Luis Villamil",
-    harts: 12,
-  },
-  {
-    name: "Luis Villamil",
-    harts: 12,
-  },
-];
 function Home() {
-  const { data } = useQuery(GET_BOOKS);
+  const { data: { getRankings: rankings } = {} } = useQuery(GET_RANKINGS);
 
   return (
     <>
@@ -56,16 +38,16 @@ function Home() {
         <Card.Body>
           <Card.Title>Top Voluntarios</Card.Title>
           <hr />
-          {topVoluntarios.map((voluntario) => (
+          {rankings?.map((voluntario) => (
             <>
               <div className="d-flex justify-content-between">
                 <div className="d-flex align-items-center">
                   <i className="bi-person"></i>
-                  <p className="ms-3">{voluntario.name}</p>
+                  <p className="ms-3">{voluntario?.user?.name}</p>
                 </div>
 
                 <div className="d-flex align-items-center me-5">
-                  <p className="me-3">+{voluntario.harts}</p>
+                  <p className="me-3">+{voluntario?.rank}</p>
                   <i className="fa-solid fa-fire"></i>
                 </div>
               </div>

@@ -22,7 +22,12 @@ function parseToken(rawToken) {
 Upload.post("/dataset", upload.single("dataset"), async function (req, res) {
   const file = req.file;
   const { name, description, rootFolder } = req.body;
-  const token = req.get("authorization");
+  const authorization = req.get("authorization");
+  const token = authorization.split(" ")[1]
+    ? authorization.split(" ")[1]
+    : authorization;
+  console.log(authorization);
+  console.log(token);
   const { user } = parseToken(token);
 
   const dataset = await Datasets.create({

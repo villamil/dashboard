@@ -59,8 +59,9 @@ const generateChunks = (experiment) =>
     });
 
     const project = await Projects.findById(experiment.project);
+
     const connectedVolunteers = await Connections.find({
-      user: { $in: [project.volunteers] },
+      user: { $in: project.volunteers },
     });
 
     let volunteerCounter = 0;
@@ -68,7 +69,7 @@ const generateChunks = (experiment) =>
       await Chunks.create({
         status: EXPERIMENT_STATUS.INITIALAZING,
         files: [...splitedWithAnnotations[x]],
-        assignedTo: connectedVolunteers[volunteerCounter],
+        assignedTo: connectedVolunteers[volunteerCounter]._id,
         experiment: experiment._id,
       });
       if (connectedVolunteers.length - 1 < volunteerCounter) {
@@ -108,4 +109,54 @@ const getObjectsFromBucket = (bucketName) =>
     });
   });
 
-module.exports = { generateChunks };
+const reAssignChunks = async () => {
+  const disconnectedClients = await Connections.find({
+    status: CONNECTION_STATUS.DISCONNECTED,
+  });
+  console.log(disconnectedClients);
+  if (disconnectedClients) {
+    const disconnectedIds = disconnectedClients.map((item) => item._id);
+    for (const disconnectedId of disconnectedIds) {
+      const allPendingChunks = await Chunks.find({
+        assignedTo: disconnectedId,
+        $or: [
+          { status: EXPERIMENT_STATUS.PROGRESS },
+          { status: EXPERIMENT_STATUS.INITIALAZING },
+        ],
+      });
+
+      for (const chunk of allPendingChunks) {
+        const pendingChunk = await Chunks.findByIdAndUpdate(
+          chunk,
+          {
+            status: EXPERIMENT_STATUS.INITIALAZING,
+          },
+          { new: true }
+        );
+
+        if (pendingChunk) {
+          const experiment = await Experiments.findById(
+            pendingChunk.experiment
+          );
+          const project = await Projects.findById(experiment.project);
+
+          const connectedVolunteers = await Connections.find({
+            user: { $in: project.volunteers },
+            status: CONNECTION_STATUS.CONNECTED,
+          });
+          if (connectedVolunteers.length) {
+            const randomSelectedVolunteer =
+              connectedVolunteers[
+                Math.floor(Math.random() * connectedVolunteers.length)
+              ];
+            await Chunks.findByIdAndUpdate(pendingChunk._id, {
+              assignedTo: randomSelectedVolunteer._id,
+            });
+          }
+        }
+      }
+    }
+  }
+};
+
+module.exports = { generateChunks, reAssignChunks };

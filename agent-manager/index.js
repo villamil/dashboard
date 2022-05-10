@@ -15,8 +15,13 @@ const Experiments = require("./collections/Experiments");
 const Chunks = require("./collections/Chunks");
 const { kebabCase } = require("lodash");
 const { CONNECTION_STATUS, EXPERIMENT_STATUS } = require("./constants");
-const { RunExperiments } = require("./controllers/Experiments");
+const {
+  RunExperiments,
+  LookForFinishedExperiments,
+} = require("./controllers/Experiments");
 const Datasets = require("./collections/Datasets");
+const { reAssignChunks } = require("./controllers/Chunks");
+const { resetConnections } = require("./controllers/Connections");
 
 let clients = [];
 let jobInstances = [];
@@ -32,17 +37,32 @@ let jobs = {};
 })();
 
 RunExperiments();
+LookForFinishedExperiments();
+reAssignChunks();
+resetConnections();
 
 function lookForExperiments() {
   setTimeout(async () => {
     console.log("Looking for experiments ");
     RunExperiments();
+    LookForFinishedExperiments();
 
     lookForExperiments();
   }, 1000 * 60);
 }
 
 lookForExperiments();
+
+function lookForOrphanChunks() {
+  setTimeout(async () => {
+    console.log("Looking for Orphan Chunks ");
+    reAssignChunks();
+
+    lookForOrphanChunks();
+  }, 1000 * 60);
+}
+
+lookForOrphanChunks();
 
 app.get("/start-job", (req, res) => {
   try {
@@ -63,23 +83,26 @@ app.get("/clear-buckets", (req, res) => {
 
 app.get("/chunk-files", async (req, res) => {
   try {
-    const { connectionId } = req.params;
-
-    console.log(connectionId);
+    console.log("chunk files requested");
+    const { clientId } = req.query;
+    console.log(clientId);
+    const connection = await Connections.findOne({ clientId });
+    console.log("connection", connection);
     const chunkInfo = await Chunks.findOne({
-      assignetTo: connectionId,
+      assignetTo: connection._id,
       status: EXPERIMENT_STATUS.INITIALAZING,
     });
+    console.log("chunkInfo", chunkInfo);
     const latestFinishedChunk = await Chunks.findOne(
       {
-        assignetTo: connectionId,
+        assignetTo: connection._id,
         status: EXPERIMENT_STATUS.DONE,
         experiment: chunkInfo.experiment,
       },
       {},
       { sort: { created_at: -1 } }
     );
-
+    console.log(latestFinishedChunk);
     let latestWeight;
     const experiment = await Experiments.findById(chunkInfo.experiment);
     const dataset = await Datasets.findById(experiment.dataset);
@@ -128,8 +151,10 @@ io.on("connection", async (socket) => {
     });
   }
 
-  socket.emit("send-connection-id", {
-    connectionId: connection.id,
+  let finalConnection = await Connections.findOne({ clientId });
+  console.log("send connection id", clientId, finalConnection._id);
+  socket.emit("send-connection-id-respond", {
+    connectionId: connection._id,
   });
 
   socket.on("chunk-started", async ({ chunkId }) => {

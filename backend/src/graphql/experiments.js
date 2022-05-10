@@ -2,7 +2,10 @@ const Projects = require("../collections/Projects");
 const Users = require("../collections/Users");
 const Experiments = require("../collections/Experiments");
 const Datasets = require("../collections/Datasets");
-const EXPERIMENT_STATUS = require("../constants");
+const Chunks = require("../collections/Chunks");
+const { EXPERIMENT_STATUS } = require("../constants");
+const minioClient = require("../minio");
+const { kebabCase } = require("lodash");
 
 const resolvers = {
   Query: {
@@ -43,6 +46,27 @@ const resolvers = {
     },
     async project(experiment) {
       return await Projects.findById(experiment.project);
+    },
+    async download(experiment) {
+      if (experiment.status === EXPERIMENT_STATUS.DONE) {
+        const latestFinishedChunk = await Chunks.findOne(
+          {
+            experiment: experiment._id,
+          },
+          {},
+          { sort: { created_at: -1 } }
+        );
+        const dataset = await Datasets.findById(experiment.dataset);
+        const bucketName = kebabCase(`${dataset.name}-${dataset._id}`);
+        const filename = `model-weights-${latestFinishedChunk._id}.h5`;
+        const presignedURL = await minioClient.presignedGetObject(
+          bucketName,
+          filename,
+          24 * 60 * 60
+        );
+        return presignedURL;
+      }
+      return null;
     },
   },
 };

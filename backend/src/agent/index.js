@@ -51,6 +51,7 @@ socket.on("disconnect", (reason) => {
 let blocked = false;
 
 const startJob = async () => {
+  console.log(blocked, clientId);
   if (!blocked && clientId) {
     blocked = true;
     try {
@@ -78,6 +79,7 @@ const startJob = async () => {
         );
         socket.emit("chunk-started", { chunkId: chunkInfo._id });
       }
+      blocked = false;
     } catch (error) {
       console.log(error);
       blocked = false;

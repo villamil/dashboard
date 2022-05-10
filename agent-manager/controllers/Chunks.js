@@ -64,24 +64,27 @@ const generateChunks = (experiment) =>
       user: { $in: project.volunteers },
     });
 
-    let volunteerCounter = 0;
-    for (let x = 0; x < splitedWithAnnotations.length; x++) {
-      await Chunks.create({
-        status: EXPERIMENT_STATUS.INITIALAZING,
-        files: [...splitedWithAnnotations[x]],
-        assignedTo: connectedVolunteers[volunteerCounter]._id,
-        experiment: experiment._id,
-      });
-      if (connectedVolunteers.length - 1 < volunteerCounter) {
-        volunteerCounter += 1;
+    if (connectedVolunteers.length) {
+      let volunteerCounter = 0;
+      for (let x = 0; x < splitedWithAnnotations.length; x++) {
+        await Chunks.create({
+          status: EXPERIMENT_STATUS.INITIALAZING,
+          files: [...splitedWithAnnotations[x]],
+          assignedTo: connectedVolunteers[volunteerCounter]._id,
+          experiment: experiment._id,
+        });
+        if (connectedVolunteers.length - 1 < volunteerCounter) {
+          volunteerCounter += 1;
+        }
       }
+
+      const result = await Experiments.findByIdAndUpdate(experiment._id, {
+        status: EXPERIMENT_STATUS.PROGRESS,
+      });
+
+      return resolve(result);
     }
-
-    const result = await Experiments.findByIdAndUpdate(experiment._id, {
-      status: EXPERIMENT_STATUS.PROGRESS,
-    });
-
-    return resolve(result);
+    return resolve();
   });
 
 const getFilePath = (filePath) => {

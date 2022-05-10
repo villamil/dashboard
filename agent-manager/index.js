@@ -48,7 +48,7 @@ function lookForExperiments() {
     LookForFinishedExperiments();
 
     lookForExperiments();
-  }, 1000 * 60);
+  }, 1000 * 10);
 }
 
 lookForExperiments();
@@ -59,7 +59,7 @@ function lookForOrphanChunks() {
     reAssignChunks();
 
     lookForOrphanChunks();
-  }, 1000 * 60);
+  }, 1000 * 10);
 }
 
 lookForOrphanChunks();

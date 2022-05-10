@@ -18,10 +18,14 @@ const CreateExperimentModal = () => {
     event.preventDefault();
     let formData = new FormData(event.currentTarget);
     const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
     api
       .post(`${process.env.REACT_APP_API_URL}/api/upload/dataset`, formData, {
         headers: {
           authorization: token,
+        },
+        params: {
+          userId,
         },
       })
       .then((data) => {

@@ -3,11 +3,8 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const { Client } = require("./Clients");
 const io = new Server(server);
-// const Job = require("./Job");
 const minioClient = require("./Minio");
-const template = require("lodash/template");
 const { connect, Types } = require("mongoose");
 const Connections = require("./collections/Connections");
 const Projects = require("./collections/Projects");
@@ -22,10 +19,6 @@ const {
 const Datasets = require("./collections/Datasets");
 const { reAssignChunks } = require("./controllers/Chunks");
 const { resetConnections } = require("./controllers/Connections");
-
-let clients = [];
-let jobInstances = [];
-let jobs = {};
 
 (async function () {
   await connect(process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/db", {
@@ -64,18 +57,6 @@ function lookForOrphanChunks() {
 
 lookForOrphanChunks();
 
-app.get("/start-job", (req, res) => {
-  try {
-    const job = new Job(clients);
-    jobInstances.push(job);
-    jobs[job.id] = Object.assign({}, job);
-  } catch (error) {
-    console.log(error?.message);
-  }
-
-  res.send("started");
-});
-
 app.get("/clear-buckets", (req, res) => {
   minioClient.listAllBuckets();
   res.send("cleaning...");
@@ -85,48 +66,54 @@ app.get("/chunk-files", async (req, res) => {
   try {
     console.log("chunk files requested");
     const { clientId } = req.query;
-    console.log(clientId);
     const connection = await Connections.findOne({ clientId });
-    console.log("connection", connection);
-    console.log(connection.user.toString());
-    const project = await Projects.find({
+
+    const projects = await Projects.find({
       volunteers: { $all: [Types.ObjectId(connection.user.toString())] },
     });
-    console.log("project", project);
 
-    const chunkInfo = await Chunks.findOneAndUpdate(
-      {
-        experiment: { $in: project.experiments },
-        assignetTo: { $exists: false },
-        status: EXPERIMENT_STATUS.INITIALAZING,
-      },
-      {
-        status: EXPERIMENT_STATUS.PROGRESS,
-      },
-      {
-        new: true,
-      }
-    );
-
-    console.log("chunkInfo", chunkInfo);
-    const latestFinishedChunk = await Chunks.findOne(
-      {
-        status: EXPERIMENT_STATUS.DONE,
-        experiment: chunkInfo.experiment,
-      },
-      {},
-      { sort: { created_at: -1 } }
-    );
-    console.log(latestFinishedChunk);
-    let latestWeight;
-    const experiment = await Experiments.findById(chunkInfo.experiment);
-    const dataset = await Datasets.findById(experiment.dataset);
-    const bucketName = kebabCase(`${dataset.name}-${dataset._id}`);
-
-    if (latestFinishedChunk) {
-      latestWeight = `model-weights-${latestFinishedChunk._id}.h5`;
+    if (!projects) {
+      return res.send("Project with no experiments");
     }
-    res.send({ chunkInfo, experiment, bucketName, latestWeight });
+
+    for (const project of projects) {
+      const chunkInfo = await Chunks.findOneAndUpdate(
+        {
+          experiment: { $in: project.experiments },
+          assignedTo: { $exists: false },
+          status: EXPERIMENT_STATUS.INITIALAZING,
+        },
+        {
+          status: EXPERIMENT_STATUS.PROGRESS,
+          assignedTo: connection.user,
+        },
+        {
+          new: true,
+        }
+      );
+      if (!chunkInfo) {
+        continue;
+      }
+
+      const latestFinishedChunk = await Chunks.findOne(
+        {
+          status: EXPERIMENT_STATUS.DONE,
+          experiment: chunkInfo.experiment,
+        },
+        {},
+        { sort: { created_at: -1 } }
+      );
+      let latestWeight;
+      const experiment = await Experiments.findById(chunkInfo.experiment);
+      const dataset = await Datasets.findById(experiment.dataset);
+      const bucketName = kebabCase(`${dataset.name}-${dataset._id}`);
+
+      if (latestFinishedChunk) {
+        latestWeight = `model-weights-${latestFinishedChunk._id}.h5`;
+      }
+      return res.send({ chunkInfo, experiment, bucketName, latestWeight });
+    }
+    return res.send({ chunkInfo: null });
   } catch (error) {
     res.send({});
   }
@@ -145,7 +132,8 @@ io.on("connection", async (socket) => {
     { _id: projectId, volunteers: { $ne: userId } },
     {
       $push: { volunteers: userId },
-    }
+    },
+    { new: true }
   );
 
   if (!connection) {
@@ -158,12 +146,6 @@ io.on("connection", async (socket) => {
   } else {
     connection.status = CONNECTION_STATUS.CONNECTED;
     await connection.save();
-  }
-
-  function delay(t, v) {
-    return new Promise(function (resolve) {
-      setTimeout(resolve.bind(null, v), t);
-    });
   }
 
   let finalConnection = await Connections.findOne({ clientId });

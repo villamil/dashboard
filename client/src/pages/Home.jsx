@@ -21,7 +21,7 @@ function Home() {
           <Card className="h-100">
             <Card.Body>
               <Card.Title>Total Voluntarios</Card.Title>
-              <Card.Text className="display-6">12,342</Card.Text>
+              <Card.Text className="display-6">0</Card.Text>
             </Card.Body>
           </Card>
         </Col>
@@ -29,7 +29,7 @@ function Home() {
           <Card className="h-100">
             <Card.Body>
               <Card.Title>Total Proyectos</Card.Title>
-              <Card.Text className="display-6">12,342</Card.Text>
+              <Card.Text className="display-6">0</Card.Text>
             </Card.Body>
           </Card>
         </Col>

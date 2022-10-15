@@ -19,9 +19,9 @@ const macAddressList = Object.keys(networkInterfaces).filter(
 
 let clientId = uuidv4();
 
-if (macAddressList.length) {
-  clientId = networkInterfaces[macAddressList[0]][0].mac;
-}
+// if (macAddressList.length) {
+//   clientId = networkInterfaces[macAddressList[0]][0].mac;
+// }
 
 const socket = io(
   `${variables.agent_manager_url}:${variables.agent_manager_port}`,
@@ -56,12 +56,12 @@ const startJob = async () => {
     blocked = true;
     try {
       console.log("send clientId", clientId);
-      const {
-        data: { chunkInfo, experiment, bucketName, latestWeight },
-      } = await axios.get(
-        `${variables.agent_manager_url}:${variables.agent_manager_port}/chunk-files`,
-        { params: { clientId } }
-      );
+      const { data: { chunkInfo, experiment, bucketName, latestWeight } = {} } =
+        await axios.get(
+          `${variables.agent_manager_url}:${variables.agent_manager_port}/chunk-files`,
+          { params: { clientId } }
+        );
+
       if (chunkInfo) {
         const job = new Job(socket);
         job.run(
@@ -78,8 +78,9 @@ const startJob = async () => {
           }
         );
         socket.emit("chunk-started", { chunkId: chunkInfo._id });
+      } else {
+        blocked = false;
       }
-      blocked = false;
     } catch (error) {
       console.log(error);
       blocked = false;

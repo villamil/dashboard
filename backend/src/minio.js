@@ -1,6 +1,6 @@
 const Minio = require("minio");
 require("dotenv").config();
-
+console.log(process.env.MINIO_ENDPOINT);
 const minioClient = new Minio.Client({
   endPoint: process.env.MINIO_ENDPOINT,
   port: Number(process.env.MINIO_PORT),

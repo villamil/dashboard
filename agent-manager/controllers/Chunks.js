@@ -108,7 +108,6 @@ const reAssignChunks = async () => {
   const disconnectedClients = await Connections.find({
     status: CONNECTION_STATUS.DISCONNECTED,
   });
-  console.log(disconnectedClients);
   if (disconnectedClients) {
     const disconnectedIds = disconnectedClients.map((item) => item._id);
     for (const disconnectedId of disconnectedIds) {

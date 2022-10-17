@@ -8,7 +8,6 @@ const Chunks = require("../collections/Chunks");
 let blocked = false;
 
 const RunExperiments = async () => {
-  console.log(blocked);
   if (!blocked) {
     blocked = true;
     const currentExperiments = await Experiments.find({
@@ -33,6 +32,7 @@ const LookForFinishedExperiments = async () => {
 
   for (const experiment of currentExperiments) {
     const remainingChunks = await Chunks.find({
+      experiment: experiment,
       status: EXPERIMENT_STATUS.DONE,
     });
 

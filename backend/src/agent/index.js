@@ -61,7 +61,6 @@ const startJob = async () => {
           `${variables.agent_manager_url}:${variables.agent_manager_port}/chunk-files`,
           { params: { clientId } }
         );
-
       if (chunkInfo) {
         const job = new Job(socket);
         job.run(

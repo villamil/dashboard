@@ -36,7 +36,6 @@ resetConnections();
 
 function lookForExperiments() {
   setTimeout(async () => {
-    console.log("Looking for experiments ");
     RunExperiments();
     LookForFinishedExperiments();
 
@@ -48,7 +47,6 @@ lookForExperiments();
 
 function lookForOrphanChunks() {
   setTimeout(async () => {
-    console.log("Looking for Orphan Chunks ");
     reAssignChunks();
 
     lookForOrphanChunks();
@@ -76,45 +74,68 @@ app.get("/chunk-files", async (req, res) => {
       return res.send("Project with no experiments");
     }
 
+    let experimentId = null;
     for (const project of projects) {
-      const chunkInfo = await Chunks.findOneAndUpdate(
-        {
-          experiment: { $in: project.experiments },
-          assignedTo: { $exists: false },
-          status: EXPERIMENT_STATUS.INITIALAZING,
-        },
-        {
-          status: EXPERIMENT_STATUS.PROGRESS,
-          assignedTo: connection.user,
-        },
-        {
-          new: true,
-        }
-      );
-      if (!chunkInfo) {
-        continue;
-      }
-
-      const latestFinishedChunk = await Chunks.findOne(
-        {
+      for (const experiment of project.experiments) {
+        const isExperimentDone = await Experiments.findOne({
+          _id: experiment,
           status: EXPERIMENT_STATUS.DONE,
-          experiment: chunkInfo.experiment,
-        },
-        {},
-        { sort: { created_at: -1 } }
-      );
-      let latestWeight;
-      const experiment = await Experiments.findById(chunkInfo.experiment);
-      const dataset = await Datasets.findById(experiment.dataset);
-      const bucketName = kebabCase(`${dataset.name}-${dataset._id}`);
+        });
+        if (isExperimentDone) {
+          continue;
+        }
+        const experimentInProgress = await Chunks.findOne({
+          experiment: experiment,
+          assignedTo: { $exists: true },
+          status: EXPERIMENT_STATUS.PROGRESS,
+        });
 
-      if (latestFinishedChunk) {
-        latestWeight = `model-weights-${latestFinishedChunk._id}.h5`;
+        if (!experimentInProgress) {
+          console.log("assign experiment");
+          experimentId = experiment;
+          break;
+        }
       }
-      return res.send({ chunkInfo, experiment, bucketName, latestWeight });
     }
-    return res.send({ chunkInfo: null });
+
+    const chunkInfo = await Chunks.findOneAndUpdate(
+      {
+        experiment: experimentId,
+        assignedTo: { $exists: false },
+        status: EXPERIMENT_STATUS.INITIALAZING,
+      },
+      {
+        status: EXPERIMENT_STATUS.PROGRESS,
+        assignedTo: connection.user,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!chunkInfo) {
+      return res.send({ chunkInfo: null });
+    }
+
+    const latestFinishedChunk = await Chunks.findOne(
+      {
+        status: EXPERIMENT_STATUS.DONE,
+        experiment: chunkInfo.experiment,
+      },
+      {},
+      { sort: { created_at: -1 } }
+    );
+    let latestWeight;
+    const experiment = await Experiments.findById(chunkInfo.experiment);
+    const dataset = await Datasets.findById(experiment.dataset);
+    const bucketName = kebabCase(`${dataset.name}-${dataset._id}`);
+
+    if (latestFinishedChunk) {
+      latestWeight = `model-weights-${latestFinishedChunk._id}.h5`;
+    }
+    return res.send({ chunkInfo, experiment, bucketName, latestWeight });
   } catch (error) {
+    console.log(error);
     res.send({});
   }
 });

@@ -74,6 +74,7 @@ const generateChunks = (experiment) =>
 
     const result = await Experiments.findByIdAndUpdate(experiment._id, {
       status: EXPERIMENT_STATUS.PROGRESS,
+      start: new Date().toISOString(),
     });
 
     return resolve(result);

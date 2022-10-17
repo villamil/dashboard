@@ -10,6 +10,8 @@ const Experiments = new Schema(
     dataset: { type: Schema.Types.ObjectId, ref: "Datasets" },
     project: { type: Schema.Types.ObjectId, ref: "Projects" },
     user: { type: Schema.Types.ObjectId, ref: "Users" },
+    start: { type: Schema.Types.Date },
+    end: { type: Schema.Types.Date },
   },
   {
     timestamps: true,

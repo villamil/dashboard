@@ -39,6 +39,7 @@ const LookForFinishedExperiments = async () => {
     if (remainingChunks.length === experiment.splits) {
       await Experiments.findByIdAndUpdate(experiment._id, {
         status: EXPERIMENT_STATUS.DONE,
+        end: new Date().toISOString(),
       });
     }
   }

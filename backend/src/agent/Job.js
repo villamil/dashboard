@@ -28,8 +28,37 @@ class Job {
         this.tmpFolder.name
       );
     }
-
+    try {
+      await this.pullImage();
+    } catch (error) {
+      console.log("Failed to pull Image");
+      console.log(error);
+    }
     this.startContainer();
+  }
+
+  async pullImage() {
+    return new Promise((resolve, reject) => {
+      this.docker.pull(repoTag, function (err, stream) {
+        //...
+        docker.modem.followProgress(stream, onFinished, onProgress);
+
+        if (err) {
+          reject(err);
+        }
+
+        function onFinished(err, output) {
+          //output is an array with output json parsed objects
+          //...
+          console.log("Image pull finished");
+          resolve();
+        }
+        function onProgress(event) {
+          //...
+          console.log("Pulling Image");
+        }
+      });
+    });
   }
 
   async startContainer() {

@@ -27,13 +27,25 @@ resource "aws_instance" "app_server" {
   }
 
   provisioner "file" {
-        source      = "dummy.txt"
-        destination = "/home/ubuntu/file1.txt"
+        source      = "/Users/luis/Documents/linux-agent"
+        destination = "/home/ubuntu/linux-agent"
        
         connection {
         type        = "ssh"
         user        = "ubuntu"
-        private_key = "${file("Path-to-EC2-keyPair-on-Local-system.pem")}"
+        private_key = "${file("/Users/luis/Downloads/itesoASN.pem")}"
+        host        = "${self.public_ip}"
+        }
+  }
+
+    provisioner "file" {
+        source      = "/Users/luis/Documents/config.txt"
+        destination = "/home/ubuntu/config.txt"
+       
+        connection {
+        type        = "ssh"
+        user        = "ubuntu"
+        private_key = "${file("/Users/luis/Downloads/itesoASN.pem")}"
         host        = "${self.public_ip}"
         }
   }
@@ -44,8 +56,8 @@ resource "aws_instance" "app_server" {
         curl -fsSL https://get.docker.com -o get-docker.sh
         sh get-docker.sh
         sudo chmod 666 /var/run/docker.sock  
-
-
+        sudo chmod 777 /home/ubuntu/linux-agent
+        ./home/ubuntu/linux-agent /home/ubuntu/config.txt 
   EOL
 
   tags = {

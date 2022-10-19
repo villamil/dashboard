@@ -39,7 +39,7 @@ class Job {
 
   async pullImage() {
     return new Promise((resolve, reject) => {
-      this.docker.pull(repoTag, function (err, stream) {
+      this.docker.pull(this.args.image, function (err, stream) {
         //...
         docker.modem.followProgress(stream, onFinished, onProgress);
 

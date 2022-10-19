@@ -39,9 +39,9 @@ class Job {
 
   async pullImage() {
     return new Promise((resolve, reject) => {
-      this.docker.pull(this.args.image, function (err, stream) {
+      this.docker.pull(this.args.image, (err, stream) => {
         //...
-        docker.modem.followProgress(stream, onFinished, onProgress);
+        this.docker.modem.followProgress(stream, onFinished, onProgress);
 
         if (err) {
           reject(err);

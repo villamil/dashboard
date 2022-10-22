@@ -27,7 +27,7 @@ resource "aws_instance" "app_server" {
   }
 
   provisioner "file" {
-        source      = "/Users/luis/Documents/linux-agent"
+        source      = "/Users/luis/Documents/Client/linux-agent"
         destination = "/home/ubuntu/linux-agent"
        
         connection {
@@ -39,7 +39,7 @@ resource "aws_instance" "app_server" {
   }
 
     provisioner "file" {
-        source      = "/Users/luis/Documents/config.txt"
+        source      = "/Users/luis/Documents/Client/config.txt"
         destination = "/home/ubuntu/config.txt"
        
         connection {

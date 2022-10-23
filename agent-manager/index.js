@@ -76,7 +76,9 @@ app.get("/chunk-files", async (req, res) => {
 
     let experimentId = null;
     for (const project of projects) {
+      console.log("Project", project);
       for (const experiment of project.experiments) {
+        console.log("Experiment", experiment);
         const isExperimentDone = await Experiments.findOne({
           _id: experiment,
           status: EXPERIMENT_STATUS.DONE,
@@ -97,7 +99,7 @@ app.get("/chunk-files", async (req, res) => {
         }
       }
     }
-
+    console.log("Using experimentId", experimentId);
     const chunkInfo = await Chunks.findOneAndUpdate(
       {
         experiment: experimentId,
@@ -114,6 +116,7 @@ app.get("/chunk-files", async (req, res) => {
     );
 
     if (!chunkInfo) {
+      console.log("No Chunk available");
       return res.send({ chunkInfo: null });
     }
 

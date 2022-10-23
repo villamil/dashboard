@@ -16,7 +16,7 @@ provider "aws" {
 resource "aws_instance" "app_server" {
   ami           = "ami-08c40ec9ead489470"
   instance_type = "t2.small"
-  count         = 1
+  count         = 10
   key_name      = "itesoASN"
   vpc_security_group_ids = [aws_security_group.client-sg.id]
 
@@ -39,7 +39,7 @@ resource "aws_instance" "app_server" {
   }
 
     provisioner "file" {
-        source      = "/Users/luis/Documents/Client/config.txt"
+        source      = "/Users/luis/Documents/Client/Cliente-${count.index + 1}/config.txt"
         destination = "/home/ubuntu/config.txt"
        
         connection {

@@ -1,8 +1,8 @@
-minio_endpoint      : 54.204.88.224
+minio_endpoint      : 52.90.56.57
 minio_port          : 9000
 minio_access_key    : AKIAIOSFODNN7EXAMPLE
 minio_secret_key    : wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-agent_manager_url   : http://54.204.88.224
+agent_manager_url   : http://52.90.56.57
 agent_manager_port  : 8080
 user_id             : 634aff5e0fd6c6b8400129e8
 project_id          : 63542e299f9f5c727d87870c
